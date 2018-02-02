@@ -15,7 +15,6 @@
 
 #include "convert.h"
 
-#include <string>
 #include <pcl_conversions/pcl_conversions.h>
 
 namespace velodyne_pointcloud
@@ -49,7 +48,6 @@ namespace velodyne_pointcloud
                 uint32_t level)
   {
   ROS_INFO("Reconfigure Request");
-  
   data_->setParameters(config.min_range, config.max_range, config.view_direction,
                        config.view_width);
   }
@@ -57,8 +55,8 @@ namespace velodyne_pointcloud
   /** @brief Callback for raw scan messages. */
   void Convert::processScan(const velodyne_msgs::VelodyneScan::ConstPtr &scanMsg)
   {
-//if (output_.getNumSubscribers() == 0)         // no one listening?
-//     return;                                     // avoid much work
+    if (output_.getNumSubscribers() == 0)         // no one listening?
+      return;                                     // avoid much work
 
     // allocate a point cloud with same time and frame ID as raw data
     velodyne_rawdata::VPointCloud::Ptr
@@ -68,13 +66,6 @@ namespace velodyne_pointcloud
     outMsg->header.frame_id = scanMsg->header.frame_id;
     outMsg->height = 1;
 
-    std::ostringstream stringStream;
-    stringStream << "/media/nvidia/bdd_ssd_01/mkz_data/calibration/2017-11-04-11-04-17_0/" << scanMsg->header.stamp << "-cloudpoint.csv";
-
-    data_->output_file.open(stringStream.str().c_str(), std::fstream::out);
-    data_->is_output=true;
-    ROS_INFO_STREAM("start processing!");
-    ROS_INFO_STREAM(stringStream.str());
     // process each packet provided by the driver
     for (size_t i = 0; i < scanMsg->packets.size(); ++i)
       {
@@ -85,9 +76,6 @@ namespace velodyne_pointcloud
     ROS_DEBUG_STREAM("Publishing " << outMsg->height * outMsg->width
                      << " Velodyne points, time: " << outMsg->header.stamp);
     output_.publish(outMsg);
-    data_->output_file.close();
-    ROS_INFO_STREAM("finished writing csv file!");
-
   }
 
 } // namespace velodyne_pointcloud

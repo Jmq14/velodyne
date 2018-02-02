@@ -22,6 +22,7 @@
 
 #include <errno.h>
 #include <stdint.h>
+#include <fstream>
 #include <string>
 #include <boost/format.hpp>
 #include <math.h>
@@ -147,9 +148,15 @@ namespace velodyne_rawdata
     int setupOffline(std::string calibration_file, double max_range_, double min_range_);
 
     void unpack(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
+
+    //void set_output(std::fstream &o);
     
     void setParameters(double min_range, double max_range, double view_direction,
                        double view_width);
+
+    std::fstream output_file;
+    bool is_output;
+
 
   private:
 

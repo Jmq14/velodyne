@@ -1,0 +1,6 @@
+<launch>
+  <node name="rosbag" pkg="rosbag" type="play" args="-r 0.1 /media/nvidia/bdd_ssd_01/BDD_data/car/1104/lidar/2017-11-04-11-04-17_0.bag" />
+  <node pkg="velodyne_pointcloud" type="cloud_node" name="point_cloud" >
+    <param name="calibration" value="$(find velodyne_pointcloud)/params/64HDL_S2.yaml"/>
+  </node>
+ </launch>

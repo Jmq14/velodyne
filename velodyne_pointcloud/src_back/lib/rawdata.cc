@@ -71,8 +71,6 @@ namespace velodyne_rawdata
       config_.min_angle = 0;
       config_.max_angle = 36000;
     }
-
-    is_output = false;
   }
 
   /** Set up for on-line operation. */
@@ -139,12 +137,6 @@ namespace velodyne_rawdata
       return 0;
   }
 
-//  void RawData::set_output(std::fstream &o) {
-//      output_file = std::fstream(&o);
-//      is_output = true;
-//      return ;
-//  }
-
 
   /** @brief convert raw packet to point cloud
    *
@@ -155,7 +147,6 @@ namespace velodyne_rawdata
                        VPointCloud &pc)
   {
     ROS_DEBUG_STREAM("Received packet, time: " << pkt.stamp);
-    ROS_INFO_STREAM(calibration_.num_lasers);
     
     /** special parsing for the VLP16 **/
     if (calibration_.num_lasers == 16)
@@ -165,7 +156,6 @@ namespace velodyne_rawdata
     }
     
     const raw_packet_t *raw = (const raw_packet_t *) &pkt.data[0];
-    
 
     for (int i = 0; i < BLOCKS_PER_PACKET; i++) {
 
@@ -293,7 +283,7 @@ namespace velodyne_rawdata
                              * (1 - corrections.focal_distance / 13100) 
                              * (1 - corrections.focal_distance / 13100);
           float focal_slope = corrections.focal_slope;
-          intensity += focal_slope * (abs(focal_offset - 256 * 
+          intensity += focal_slope * (std::abs(focal_offset - 256 * 
             (1 - static_cast<float>(tmp.uint)/65535)*(1 - static_cast<float>(tmp.uint)/65535)));
           intensity = (intensity < min_intensity) ? min_intensity : intensity;
           intensity = (intensity > max_intensity) ? max_intensity : intensity;
@@ -310,18 +300,8 @@ namespace velodyne_rawdata
   
             // append this point to the cloud
             pc.points.push_back(point);
-
             ++pc.width;
-
-            // write file
-            
           }
-            if (is_output){
-                output_file << x_coord << ',' << y_coord << ',' << z_coord << ',' << intensity << ',' 
-                    << corrections.laser_ring << ',' 
-                    << raw->blocks[i].rotation << ','
-                    << raw->revolution << '\n';
-            }
         }
       }
     }
@@ -482,7 +462,7 @@ namespace velodyne_rawdata
                                * (1 - corrections.focal_distance / 13100) 
                                * (1 - corrections.focal_distance / 13100);
             float focal_slope = corrections.focal_slope;
-            intensity += focal_slope * (abs(focal_offset - 256 * 
+            intensity += focal_slope * (std::abs(focal_offset - 256 * 
               (1 - tmp.uint/65535)*(1 - tmp.uint/65535)));
             intensity = (intensity < min_intensity) ? min_intensity : intensity;
             intensity = (intensity > max_intensity) ? max_intensity : intensity;

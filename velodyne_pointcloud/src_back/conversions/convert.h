@@ -48,8 +48,6 @@ namespace velodyne_pointcloud
     ros::Subscriber velodyne_scan_;
     ros::Publisher output_;
 
-    std::fstream output_file;
-
     /// configuration parameters
     typedef struct {
       int npackets;                    ///< number of packets to combine
